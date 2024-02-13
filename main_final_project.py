@@ -1,33 +1,4 @@
-"""
-Created on Tue Jul 25 12:37:26 2023
 
-@author: sandy
-"""
-import numpy as np
-import pandas as pd
-import Build_data_report as BDR
-import Plot_data_figures as PDF
-
-
-#User input business perameters
-x_cost = 1.0
-y_cost = 1.25
-sell_height = 3
-dollar_per_kg = 12
-kg_per_m = 10
-dollar_per_m = dollar_per_kg*kg_per_m
-num_plants = 20000
-
-#x_data = np.loadtxt("x_grow.csv", delimiter=",")
-#y_data = np.loadtxt("y_grow.csv", delimiter=",")
-x_data = pd.read_csv("C:/Users/sandy/OneDrive/Documents/Summer 2023/Computing - 300/Final/x_grow.csv", delimiter=",")
-y_data = pd.read_csv("C:/Users/sandy/OneDrive/Documents/Summer 2023/Computing - 300/Final/y_grow.csv", delimiter=",")
-x_data = np.array(x_data)
-y_data = np.array(y_data)
-
-x_data_list_0,x_data_list_1 = BDR.build_data_list(x_data)
-y_data_list_0,y_data_list_1 = BDR.build_data_list(y_data)
-            
 sell_day_x = BDR.find_sell_day(x_data,sell_height)
 sell_day_y = BDR.find_sell_day(y_data,sell_height)
 
