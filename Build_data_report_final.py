@@ -8,6 +8,20 @@ import math
 
 #For rounding later on:
 def find_mantissa(num):
+    """
+    Finds optimal rounded values for report printing.
+
+    Parameters
+    ----------
+    num : float
+        number you are trying to round.
+
+    Returns
+    -------
+    rounded_num : float
+        rounded number to three decimal places.
+
+    """
     scale = int(round(np.log10(num),0))-3
     mantissa = int(round(num/10**scale,0))
     rounded_num = mantissa*10**scale
@@ -15,6 +29,20 @@ def find_mantissa(num):
     return rounded_num
 
 def report_million(num):
+    """
+    Rounds numbers for ploting to reflect per million.
+
+    Parameters
+    ----------
+    num : float
+        number you are trying to round.
+
+    Returns
+    -------
+    float
+        number per million.
+
+    """
     if num >= 1000000:
         num = int(round(num/1000000))
         return f'{num} Million'
@@ -23,6 +51,22 @@ def report_million(num):
 
 #Build data report
 def build_data_list(data):
+    """
+    Builds a list from a set of numbers.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+
+    Returns
+    -------
+    data_list_0 : list of floats
+        list of data from first column of data file.
+    data_list_1 : list of floats
+        list of data from second column of data file.
+
+    """
     data_list_0 = []
     data_list_1 = []
     for i in range(len(data)):
@@ -32,6 +76,27 @@ def build_data_list(data):
         
 #Question 3:
 def find_sell_day(data,sell_height):
+    """
+    Finds day you can sell plants per input specifications.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    sell_height : float
+        input parameter by business owner, the height we can sell plants at.
+
+    Raises
+    ------
+    Exception
+        Plant never grew tall enough to sell.
+
+    Returns
+    -------
+    mom_at_3 : float
+        moment plant grew tall enough to sell.
+
+    """
     for i in range(len(data)):
         if data[i][1] >= sell_height:
             max_day = data[i][0]
@@ -43,12 +108,49 @@ def find_sell_day(data,sell_height):
     raise Exception("Did not reach 3 meters in observed duration. Expand duration or adjust expected height.")
     
 def find_sell_moment(data,sell_day):
+    """
+    Finds moment we can sell plants discretizing data given in days to data given in minutes.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    sell_day : float
+        day that plant grows tall enough to sell.
+
+    Returns
+    -------
+    extra : float
+        extra part of the day that should be accounted for to find moment in day we can sell plant.
+
+    """
     extra = sell_day - int(sell_day)
     extra = 24*extra
     extra = round(extra,0)
     return extra
 
 def find_pointwise_growth_rate(data, sell_day):
+    """
+    Finds rate of growth in meters of growth per day.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    sell_day : float
+        day that plant grows tall enough to sell.
+
+    Raises
+    ------
+    Exception
+        plant was bought tall enough to sell.
+
+    Returns
+    -------
+    rate : float
+        rate of growth in meters per day.
+
+    """
     for i in range(len(data)):
         if data[i][0] >= sell_day:
             if i == 0:
@@ -61,6 +163,20 @@ def find_pointwise_growth_rate(data, sell_day):
             return rate
         
 def find_growth_rates(data):
+    """
+    Finds rate of growth for plant at each day.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+
+    Returns
+    -------
+    growth_rates : list of floats
+        rates of growth in meters per day for each point in the data.
+
+    """
     growth_rates = []
     dh0 = data[1][1] - data[0][1]
     dt0 = data[1][0] - data[0][0]
@@ -87,6 +203,24 @@ def find_growth_rates(data):
     return growth_rates
 
 def find_peak_growth(data,growth_rates):
+    """
+    Finds where plant will reach its peak height.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    growth_rates : list of floats
+        rates of growth in meters per day for each point in the data.
+
+    Returns
+    -------
+    max_rate : float
+        max rate of growth for plant.
+    max_day : float
+        day that max growth rate is achieved for the plant.
+
+    """
     new_max_rate = 0
     for i in range(len(growth_rates)):
         max_rate = new_max_rate
@@ -97,6 +231,28 @@ def find_peak_growth(data,growth_rates):
     return max_rate, max_day
 
 def find_optimal_duration(data,cost,dollar_per_m,sell_day):
+    """
+    Finds optimal duration to keep plant growing.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    cost : float
+        cost of initial plant.
+    dollar_per_m : float
+        dollar earned per meter of plant growth.
+    sell_day : float
+        day you can sell plant for which it has reached initial parameter of growth.
+
+    Returns
+    -------
+    max_day : float
+        optimal day to cut plant for max profit to be obtained.
+    max_profit : float
+        maximal profit earned per plant in dollars.
+
+    """
     t_max = len(data)
     profit = []
     max_day = 0
@@ -111,6 +267,28 @@ def find_optimal_duration(data,cost,dollar_per_m,sell_day):
 
 #Bonus Question
 def find_actual_profit(data,sell_day,dollar_per_m,cost):
+    """
+    Finds actual profit for which you can earn if utilizing optimal calculations.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    sell_day : float
+        day you can sell plant for which it has reached initial parameter of growth.
+    dollar_per_m : float
+        dollar earned per meter of plant growth.
+    cost : float
+        cost of initial plant.
+
+    Returns
+    -------
+    max_profit : float
+        maximal profit earned per plant in dollars.
+    optimal_cycles : list of floats
+        list of optimal cycles you should run to maximize profit.
+
+    """
     cycles = int(math.trunc(len(data)/int(round(sell_day,0))))
     max_profit = 0
     for i in range(1,cycles+1):
@@ -124,6 +302,33 @@ def find_actual_profit(data,sell_day,dollar_per_m,cost):
 
 #For building a histogram
 def find_actual_profit_cycles(data,sell_day,dollar_per_m,cost,days):
+    """
+    Finds actual profit aquired in dollars.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    sell_day : float
+        day you can sell plant for which it has reached initial parameter of growth.
+    dollar_per_m : float
+        dollar earned per meter of plant growth.
+    cost : float
+        cost of initial plant.
+    days : float
+        days of growth found from optimal cycles calculation.
+
+    Raises
+    ------
+    Exception
+        plant is not tall enough to sell.
+
+    Returns
+    -------
+    float
+        rounded profit.
+
+    """
     if sell_day > days:
         raise Exception("The requested duration is shorter than the eligible sell day. Choose a longer duration or different fertilizer.")
     cycles = int(math.trunc(len(data)/int(round(days,0))))
@@ -132,6 +337,25 @@ def find_actual_profit_cycles(data,sell_day,dollar_per_m,cost,days):
     return find_mantissa(profit)
 
 def find_optimal_lists(data,optimal_cycles):
+    """
+    Finds list of optimal cycles from optimal cycles.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    optimal_cycles : list of floats
+        list of optimal cycles you should run to maximize profit.
+
+    Returns
+    -------
+    x_list_optimal_0 : list of floats
+        list of days of optimal growth for plant data.
+        DESCRIPTION.
+    x_list_optimal_1 : list of floats
+        list of height of optimal growth for plant data.
+
+    """
     x_list_optimal_0 = []
     x_list_optimal_1 = []
     for i in range(int(len(data)/optimal_cycles)):
@@ -140,6 +364,28 @@ def find_optimal_lists(data,optimal_cycles):
     return x_list_optimal_0,x_list_optimal_1
 
 def find_profit_data(data,sell_day,dollar_per_m,cost):
+    """
+    Builds list of profits utilizing optimal calculations.
+
+    Parameters
+    ----------
+    data : array of array of floats
+        arrays of data generated from data file with two columns.
+    sell_day : float
+        day you can sell plant for which it has reached initial parameter of growth.
+    dollar_per_m : float
+        dollar earned per meter of plant growth.
+    cost : float
+        cost of initial plant.
+
+    Returns
+    -------
+    profits : list of floats
+        profits made for each day.
+    nums : list of ints
+        number of days we are growing plants.
+
+    """
     num = len(data)
     nums = [num]
     profits = []
@@ -152,11 +398,51 @@ def find_profit_data(data,sell_day,dollar_per_m,cost):
     return profits, nums
 
 def find_optimal_average_growth(list_optimal_1):
+    """
+    Finds average growth of each plant utilizing optimal growth data.
+
+    Parameters
+    ----------
+    list_optimal_1 : list of floats
+        list of height of optimal growth for plant data.
+
+    Returns
+    -------
+    optimal_average_growth : float
+        average growth from utilizing optimal cycle in meters.
+
+    """
     summands1 = sum(list_optimal_1)
     optimal_average_growth = summands1/len(list_optimal_1)
     return optimal_average_growth
 
 def find_risk(cost,sell_day,optimal_cycles,num_plants,dollar_per_m,list_optimal_0,list_optimal_1):
+    """
+    Calculates risk associated with growing these plants.
+
+    Parameters
+    ----------
+    cost : float
+        cost of initial plant.
+    sell_day : float
+        day you can sell plant for which it has reached initial parameter of growth.
+    optimal_cycles : list of floats
+        list of optimal cycles you should run to maximize profit.
+    num_plants : int
+        number of plants grown at one time.
+    dollar_per_m : float
+        dollar earned per meter of plant growth.
+    list_optimal_0 : list of floats
+        list of days of optimal growth for plant data.
+    list_optimal_1 : list of floats
+        list of height of optimal growth for plant data.
+
+    Returns
+    -------
+    risks : list of floats
+        financial risk associated with each day of growth in dollars.
+
+    """
     risks = []
     summands = np.zeros(optimal_cycles)
     for i in range(optimal_cycles):
@@ -171,6 +457,32 @@ def find_risk(cost,sell_day,optimal_cycles,num_plants,dollar_per_m,list_optimal_
     return risks
 
 def find_risks(cost,sell_day,optimal_cycles,list_optimal_0,list_optimal_1,dollar_per_m,num_plants):
+    """
+    Calculates risks associated with growing these plants.
+
+    Parameters
+    ----------
+    cost : float
+        cost of initial plant.
+    sell_day : float
+        day you can sell plant for which it has reached initial parameter of growth.
+    optimal_cycles : list of floats
+        list of optimal cycles you should run to maximize profit.
+    list_optimal_0 : list of floats
+        list of days of optimal growth for plant data.
+    list_optimal_1 : list of floats
+        list of height of optimal growth for plant data.
+    dollar_per_m : float
+        dollar earned per meter of plant growth.
+    num_plants : int
+        number of plants grown at one time.
+
+    Returns
+    -------
+    risks : list of floats
+        financial risk associated with each day of growth in dollars.
+
+    """
     risks = []
     for j in range(optimal_cycles):
         for i in range(len(list_optimal_0)):
